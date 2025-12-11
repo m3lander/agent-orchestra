@@ -60,6 +60,41 @@ program
     }
   });
 
+// Show agent versions
+program
+  .command("status")
+  .description("Show versions of installed agents")
+  .action(async () => {
+    console.log(chalk.bold("\nAgent Status:\n"));
+
+    for (const [key, agent] of Object.entries(agents)) {
+      let versionStr = chalk.gray("checking...");
+      const versionArg = key === "jules" ? "version" : "--version";
+
+      try {
+        const proc = Bun.spawn([agent.command, versionArg], {
+          stdout: "pipe",
+          stderr: "pipe",
+        });
+
+        const output = await new Response(proc.stdout).text();
+        await proc.exited;
+
+        if (proc.exitCode === 0) {
+          const cleanVersion = output.trim().split("\n")[0];
+          versionStr = chalk.green(cleanVersion || "installed");
+        } else {
+          versionStr = chalk.red("not found or error");
+        }
+      } catch {
+        versionStr = chalk.red("not found");
+      }
+
+      console.log(`  ${chalk.bold(key.padEnd(10))} ${versionStr}`);
+    }
+    console.log();
+  });
+
 // Run a task with a specific agent
 program
   .command("run")
