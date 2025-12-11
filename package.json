@@ -1,0 +1,25 @@
+{
+  "name": "agent-orchestra",
+  "version": "0.1.0",
+  "description": "CLI tool to orchestrate multiple AI coding agents (Claude, Gemini, Jules)",
+  "type": "module",
+  "bin": {
+    "orchestra": "./dist/cli.js"
+  },
+  "scripts": {
+    "build": "bun build src/cli.ts --outdir dist --target node",
+    "dev": "bun run src/cli.ts",
+    "test": "bun test"
+  },
+  "keywords": ["cli", "ai", "agents", "claude", "gemini", "jules", "orchestration"],
+  "author": "maxmelander",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/bun": "latest",
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "commander": "^12.0.0",
+    "chalk": "^5.3.0"
+  }
+}
