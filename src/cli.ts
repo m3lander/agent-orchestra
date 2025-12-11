@@ -3,16 +3,16 @@ import { Command } from "commander";
 import chalk from "chalk";
 import { spawn } from "child_process";
 
-const program = new Command();
+export const program = new Command();
 
-interface AgentConfig {
+export interface AgentConfig {
   name: string;
   command: string;
   type: "sync" | "async";
   description: string;
 }
 
-const agents: Record<string, AgentConfig> = {
+export const agents: Record<string, AgentConfig> = {
   claude: {
     name: "Claude Code",
     command: "claude",
@@ -184,10 +184,15 @@ program
     }
   });
 
+// Exported for testing
+export const bunUtils = {
+  spawn: Bun.spawn,
+};
+
 // Helper functions
-async function checkAgentInstalled(command: string): Promise<boolean> {
+export async function checkAgentInstalled(command: string): Promise<boolean> {
   try {
-    const proc = Bun.spawn(["which", command], { stdout: "pipe" });
+    const proc = bunUtils.spawn(["which", command], { stdout: "pipe" });
     await proc.exited;
     return proc.exitCode === 0;
   } catch {
@@ -195,18 +200,18 @@ async function checkAgentInstalled(command: string): Promise<boolean> {
   }
 }
 
-async function runClaude(task: string): Promise<void> {
+export async function runClaude(task: string): Promise<void> {
   console.log(chalk.gray(`Running: claude -p "${task}"`));
   await runCommand("claude", ["-p", task]);
 }
 
-async function runGemini(task: string, yolo: boolean): Promise<void> {
+export async function runGemini(task: string, yolo: boolean): Promise<void> {
   const args = yolo ? ["-y", task] : [task];
   console.log(chalk.gray(`Running: gemini ${args.join(" ")}`));
   await runCommand("gemini", args);
 }
 
-async function runJules(
+export async function runJules(
   task: string,
   repo: string | undefined,
   parallel: number
@@ -220,7 +225,7 @@ async function runJules(
   await runCommand("jules", args);
 }
 
-async function runCommand(cmd: string, args: string[]): Promise<void> {
+export async function runCommand(cmd: string, args: string[]): Promise<void> {
   const proc = spawn(cmd, args, {
     stdio: "inherit",
     shell: true,
@@ -235,4 +240,6 @@ async function runCommand(cmd: string, args: string[]): Promise<void> {
   });
 }
 
-program.parse();
+if (process.env.NODE_ENV !== "test") {
+  program.parse();
+}
